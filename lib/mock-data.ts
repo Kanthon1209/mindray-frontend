@@ -83,76 +83,105 @@ export const provinceMapData: ProvinceData[] = [
   { name: "澳门特别行政区", value: 0 },
 ];
 
-const provinces = [
-  "北京市", "上海市", "广东省", "江苏省", "浙江省", "山东省", "四川省",
-  "河南省", "湖北省", "湖南省", "福建省", "安徽省", "江西省", "辽宁省",
-  "陕西省", "重庆市", "河北省", "山西省", "云南省", "广西壮族自治区",
+// 固定的 Mock 医院数据（不使用 Math.random，避免 SSR/CSR Hydration Mismatch）
+export const mockHospitals: Hospital[] = [
+  { id: "h1", name: "东城区人民医院", province: "北京市", city: "东城区", level: "三级甲等", type: "综合医院", deviceCount: 5, deviceModels: ["BS-2000M", "CL-8000", "BC-7500"], status: "active" },
+  { id: "h2", name: "西城区中心医院", province: "北京市", city: "西城区", level: "三级甲等", type: "综合医院", deviceCount: 3, deviceModels: ["BS-2200", "CL-6000"], status: "active" },
+  { id: "h3", name: "朝阳区第一人民医院", province: "北京市", city: "朝阳区", level: "三级乙等", type: "综合医院", deviceCount: 6, deviceModels: ["BS-2000M", "CL-8000", "BC-6800", "BC-7500"], status: "active" },
+  { id: "h4", name: "海淀区中西医结合医院", province: "北京市", city: "海淀区", level: "二级甲等", type: "专科医院", deviceCount: 2, deviceModels: ["CL-6000"], status: "pending" },
+
+  { id: "h5", name: "黄浦区人民医院", province: "上海市", city: "黄浦区", level: "三级甲等", type: "综合医院", deviceCount: 4, deviceModels: ["BS-2000M", "CL-8000"], status: "active" },
+  { id: "h6", name: "徐汇区中心医院", province: "上海市", city: "徐汇区", level: "三级甲等", type: "综合医院", deviceCount: 7, deviceModels: ["BS-2000M", "BS-2200", "CL-8000", "BC-7500"], status: "active" },
+  { id: "h7", name: "浦东新区第一人民医院", province: "上海市", city: "浦东新区", level: "三级甲等", type: "综合医院", deviceCount: 5, deviceModels: ["CL-8000", "BC-6800", "BC-7500"], status: "active" },
+  { id: "h8", name: "静安区中医院", province: "上海市", city: "静安区", level: "二级甲等", type: "中医医院", deviceCount: 1, deviceModels: ["CL-6000"], status: "inactive" },
+
+  { id: "h9", name: "广州人民医院", province: "广东省", city: "广州", level: "三级甲等", type: "综合医院", deviceCount: 6, deviceModels: ["BS-2000M", "CL-8000", "BC-7500"], status: "active" },
+  { id: "h10", name: "深圳中心医院", province: "广东省", city: "深圳", level: "三级甲等", type: "综合医院", deviceCount: 8, deviceModels: ["BS-2000M", "BS-2200", "CL-8000", "CL-6000", "BC-6800"], status: "active" },
+  { id: "h11", name: "东莞第一人民医院", province: "广东省", city: "东莞", level: "二级甲等", type: "综合医院", deviceCount: 3, deviceModels: ["BS-2200", "CL-6000"], status: "pending" },
+  { id: "h12", name: "佛山中医院", province: "广东省", city: "佛山", level: "二级甲等", type: "中医医院", deviceCount: 2, deviceModels: ["BC-6800"], status: "active" },
+
+  { id: "h13", name: "南京人民医院", province: "江苏省", city: "南京", level: "三级甲等", type: "综合医院", deviceCount: 5, deviceModels: ["BS-2000M", "CL-8000", "BC-7500"], status: "active" },
+  { id: "h14", name: "苏州中心医院", province: "江苏省", city: "苏州", level: "三级甲等", type: "综合医院", deviceCount: 4, deviceModels: ["CL-8000", "BC-6800"], status: "active" },
+  { id: "h15", name: "无锡第一人民医院", province: "江苏省", city: "无锡", level: "三级乙等", type: "综合医院", deviceCount: 3, deviceModels: ["BS-2200", "CL-6000"], status: "active" },
+  { id: "h16", name: "常州妇幼保健院", province: "江苏省", city: "常州", level: "二级甲等", type: "妇幼保健院", deviceCount: 2, deviceModels: ["BC-7500"], status: "pending" },
+
+  { id: "h17", name: "杭州人民医院", province: "浙江省", city: "杭州", level: "三级甲等", type: "综合医院", deviceCount: 6, deviceModels: ["BS-2000M", "CL-8000", "BC-7500"], status: "active" },
+  { id: "h18", name: "宁波中心医院", province: "浙江省", city: "宁波", level: "三级甲等", type: "综合医院", deviceCount: 4, deviceModels: ["CL-8000", "BC-6800"], status: "active" },
+  { id: "h19", name: "温州第一人民医院", province: "浙江省", city: "温州", level: "三级乙等", type: "综合医院", deviceCount: 3, deviceModels: ["BS-2200"], status: "active" },
+  { id: "h20", name: "绍兴中医院", province: "浙江省", city: "绍兴", level: "二级甲等", type: "中医医院", deviceCount: 1, deviceModels: ["CL-6000"], status: "inactive" },
+
+  { id: "h21", name: "济南人民医院", province: "山东省", city: "济南", level: "三级甲等", type: "综合医院", deviceCount: 5, deviceModels: ["BS-2000M", "CL-8000"], status: "active" },
+  { id: "h22", name: "青岛中心医院", province: "山东省", city: "青岛", level: "三级甲等", type: "综合医院", deviceCount: 7, deviceModels: ["BS-2000M", "BS-2200", "CL-8000", "BC-7500"], status: "active" },
+  { id: "h23", name: "烟台第一人民医院", province: "山东省", city: "烟台", level: "二级甲等", type: "综合医院", deviceCount: 2, deviceModels: ["CL-6000"], status: "pending" },
+  { id: "h24", name: "潍坊中医院", province: "山东省", city: "潍坊", level: "二级乙等", type: "中医医院", deviceCount: 1, deviceModels: ["BC-6800"], status: "inactive" },
+
+  { id: "h25", name: "成都人民医院", province: "四川省", city: "成都", level: "三级甲等", type: "综合医院", deviceCount: 6, deviceModels: ["BS-2000M", "CL-8000", "BC-7500"], status: "active" },
+  { id: "h26", name: "绵阳中心医院", province: "四川省", city: "绵阳", level: "三级乙等", type: "综合医院", deviceCount: 3, deviceModels: ["BS-2200", "CL-6000"], status: "active" },
+  { id: "h27", name: "德阳第一人民医院", province: "四川省", city: "德阳", level: "二级甲等", type: "综合医院", deviceCount: 2, deviceModels: ["BC-6800"], status: "pending" },
+  { id: "h28", name: "宜宾中医院", province: "四川省", city: "宜宾", level: "二级甲等", type: "中医医院", deviceCount: 1, deviceModels: ["CL-6000"], status: "inactive" },
+
+  { id: "h29", name: "郑州人民医院", province: "河南省", city: "郑州", level: "三级甲等", type: "综合医院", deviceCount: 5, deviceModels: ["BS-2000M", "CL-8000"], status: "active" },
+  { id: "h30", name: "洛阳中心医院", province: "河南省", city: "洛阳", level: "三级乙等", type: "综合医院", deviceCount: 4, deviceModels: ["BS-2200", "CL-8000", "BC-6800"], status: "active" },
+  { id: "h31", name: "开封第一人民医院", province: "河南省", city: "开封", level: "二级甲等", type: "综合医院", deviceCount: 2, deviceModels: ["CL-6000"], status: "pending" },
+  { id: "h32", name: "新乡妇幼保健院", province: "河南省", city: "新乡", level: "二级甲等", type: "妇幼保健院", deviceCount: 1, deviceModels: ["BC-7500"], status: "inactive" },
+
+  { id: "h33", name: "武汉人民医院", province: "湖北省", city: "武汉", level: "三级甲等", type: "综合医院", deviceCount: 8, deviceModels: ["BS-2000M", "BS-2200", "CL-8000", "CL-6000", "BC-6800"], status: "active" },
+  { id: "h34", name: "宜昌中心医院", province: "湖北省", city: "宜昌", level: "三级乙等", type: "综合医院", deviceCount: 3, deviceModels: ["BS-2200", "CL-6000"], status: "active" },
+  { id: "h35", name: "襄阳第一人民医院", province: "湖北省", city: "襄阳", level: "二级甲等", type: "综合医院", deviceCount: 2, deviceModels: ["BC-6800"], status: "pending" },
+  { id: "h36", name: "荆州中医院", province: "湖北省", city: "荆州", level: "二级乙等", type: "中医医院", deviceCount: 1, deviceModels: ["CL-6000"], status: "inactive" },
+
+  { id: "h37", name: "长沙人民医院", province: "湖南省", city: "长沙", level: "三级甲等", type: "综合医院", deviceCount: 5, deviceModels: ["BS-2000M", "CL-8000", "BC-7500"], status: "active" },
+  { id: "h38", name: "株洲中心医院", province: "湖南省", city: "株洲", level: "三级乙等", type: "综合医院", deviceCount: 3, deviceModels: ["BS-2200", "CL-6000"], status: "active" },
+  { id: "h39", name: "湘潭第一人民医院", province: "湖南省", city: "湘潭", level: "二级甲等", type: "综合医院", deviceCount: 2, deviceModels: ["BC-6800"], status: "pending" },
+  { id: "h40", name: "衡阳中医院", province: "湖南省", city: "衡阳", level: "二级乙等", type: "中医医院", deviceCount: 1, deviceModels: ["CL-6000"], status: "inactive" },
+
+  { id: "h41", name: "福州人民医院", province: "福建省", city: "福州", level: "三级甲等", type: "综合医院", deviceCount: 4, deviceModels: ["BS-2000M", "CL-8000"], status: "active" },
+  { id: "h42", name: "厦门中心医院", province: "福建省", city: "厦门", level: "三级甲等", type: "综合医院", deviceCount: 6, deviceModels: ["BS-2000M", "CL-8000", "BC-7500", "BC-6800"], status: "active" },
+  { id: "h43", name: "泉州第一人民医院", province: "福建省", city: "泉州", level: "二级甲等", type: "综合医院", deviceCount: 2, deviceModels: ["CL-6000"], status: "pending" },
+  { id: "h44", name: "漳州妇幼保健院", province: "福建省", city: "漳州", level: "二级甲等", type: "妇幼保健院", deviceCount: 1, deviceModels: ["BC-7500"], status: "inactive" },
+
+  { id: "h45", name: "合肥人民医院", province: "安徽省", city: "合肥", level: "三级甲等", type: "综合医院", deviceCount: 5, deviceModels: ["BS-2000M", "CL-8000", "BC-7500"], status: "active" },
+  { id: "h46", name: "芜湖中心医院", province: "安徽省", city: "芜湖", level: "三级乙等", type: "综合医院", deviceCount: 3, deviceModels: ["BS-2200", "CL-6000"], status: "active" },
+  { id: "h47", name: "蚌埠第一人民医院", province: "安徽省", city: "蚌埠", level: "二级甲等", type: "综合医院", deviceCount: 2, deviceModels: ["BC-6800"], status: "pending" },
+  { id: "h48", name: "安庆中医院", province: "安徽省", city: "安庆", level: "二级乙等", type: "中医医院", deviceCount: 1, deviceModels: ["CL-6000"], status: "inactive" },
+
+  { id: "h49", name: "南昌人民医院", province: "江西省", city: "南昌", level: "三级甲等", type: "综合医院", deviceCount: 4, deviceModels: ["BS-2000M", "CL-8000"], status: "active" },
+  { id: "h50", name: "上饶中心医院", province: "江西省", city: "上饶", level: "三级乙等", type: "综合医院", deviceCount: 3, deviceModels: ["BS-2200", "CL-6000"], status: "active" },
+  { id: "h51", name: "九江第一人民医院", province: "江西省", city: "九江", level: "二级甲等", type: "综合医院", deviceCount: 2, deviceModels: ["BC-6800"], status: "pending" },
+  { id: "h52", name: "赣州妇幼保健院", province: "江西省", city: "赣州", level: "二级甲等", type: "妇幼保健院", deviceCount: 1, deviceModels: ["BC-7500"], status: "inactive" },
+
+  { id: "h53", name: "沈阳人民医院", province: "辽宁省", city: "沈阳", level: "三级甲等", type: "综合医院", deviceCount: 6, deviceModels: ["BS-2000M", "CL-8000", "BC-7500"], status: "active" },
+  { id: "h54", name: "大连中心医院", province: "辽宁省", city: "大连", level: "三级甲等", type: "综合医院", deviceCount: 5, deviceModels: ["BS-2200", "CL-8000", "BC-6800"], status: "active" },
+  { id: "h55", name: "鞍山第一人民医院", province: "辽宁省", city: "鞍山", level: "二级甲等", type: "综合医院", deviceCount: 2, deviceModels: ["CL-6000"], status: "pending" },
+  { id: "h56", name: "锦州中医院", province: "辽宁省", city: "锦州", level: "二级乙等", type: "中医医院", deviceCount: 1, deviceModels: ["BC-6800"], status: "inactive" },
+
+  { id: "h57", name: "西安人民医院", province: "陕西省", city: "西安", level: "三级甲等", type: "综合医院", deviceCount: 5, deviceModels: ["BS-2000M", "CL-8000", "BC-7500"], status: "active" },
+  { id: "h58", name: "宝鸡中心医院", province: "陕西省", city: "宝鸡", level: "三级乙等", type: "综合医院", deviceCount: 3, deviceModels: ["BS-2200", "CL-6000"], status: "active" },
+  { id: "h59", name: "咸阳第一人民医院", province: "陕西省", city: "咸阳", level: "二级甲等", type: "综合医院", deviceCount: 2, deviceModels: ["BC-6800"], status: "pending" },
+  { id: "h60", name: "渭南中医院", province: "陕西省", city: "渭南", level: "二级乙等", type: "中医医院", deviceCount: 1, deviceModels: ["CL-6000"], status: "inactive" },
+
+  { id: "h61", name: "渝中区人民医院", province: "重庆市", city: "渝中区", level: "三级甲等", type: "综合医院", deviceCount: 4, deviceModels: ["BS-2000M", "CL-8000"], status: "active" },
+  { id: "h62", name: "江北区中心医院", province: "重庆市", city: "江北区", level: "三级乙等", type: "综合医院", deviceCount: 3, deviceModels: ["BS-2200", "CL-6000"], status: "active" },
+  { id: "h63", name: "沙坪坝区第一人民医院", province: "重庆市", city: "沙坪坝区", level: "二级甲等", type: "综合医院", deviceCount: 2, deviceModels: ["BC-6800"], status: "pending" },
+  { id: "h64", name: "渝北区中医院", province: "重庆市", city: "渝北区", level: "二级乙等", type: "中医医院", deviceCount: 1, deviceModels: ["CL-6000"], status: "inactive" },
+
+  { id: "h65", name: "石家庄人民医院", province: "河北省", city: "石家庄", level: "三级甲等", type: "综合医院", deviceCount: 5, deviceModels: ["BS-2000M", "CL-8000", "BC-7500"], status: "active" },
+  { id: "h66", name: "唐山中心医院", province: "河北省", city: "唐山", level: "三级乙等", type: "综合医院", deviceCount: 3, deviceModels: ["BS-2200", "CL-6000"], status: "active" },
+  { id: "h67", name: "保定第一人民医院", province: "河北省", city: "保定", level: "二级甲等", type: "综合医院", deviceCount: 2, deviceModels: ["BC-6800"], status: "pending" },
+  { id: "h68", name: "邯郸中医院", province: "河北省", city: "邯郸", level: "二级乙等", type: "中医医院", deviceCount: 1, deviceModels: ["CL-6000"], status: "inactive" },
+
+  { id: "h69", name: "太原人民医院", province: "山西省", city: "太原", level: "三级甲等", type: "综合医院", deviceCount: 4, deviceModels: ["BS-2000M", "CL-8000"], status: "active" },
+  { id: "h70", name: "大同中心医院", province: "山西省", city: "大同", level: "三级乙等", type: "综合医院", deviceCount: 3, deviceModels: ["BS-2200", "CL-6000"], status: "active" },
+  { id: "h71", name: "运城第一人民医院", province: "山西省", city: "运城", level: "二级甲等", type: "综合医院", deviceCount: 2, deviceModels: ["BC-6800"], status: "pending" },
+  { id: "h72", name: "临汾中医院", province: "山西省", city: "临汾", level: "二级乙等", type: "中医医院", deviceCount: 1, deviceModels: ["CL-6000"], status: "inactive" },
+
+  { id: "h73", name: "昆明人民医院", province: "云南省", city: "昆明", level: "三级甲等", type: "综合医院", deviceCount: 5, deviceModels: ["BS-2000M", "CL-8000", "BC-7500"], status: "active" },
+  { id: "h74", name: "曲靖中心医院", province: "云南省", city: "曲靖", level: "三级乙等", type: "综合医院", deviceCount: 3, deviceModels: ["BS-2200", "CL-6000"], status: "active" },
+  { id: "h75", name: "大理第一人民医院", province: "云南省", city: "大理", level: "二级甲等", type: "综合医院", deviceCount: 2, deviceModels: ["BC-6800"], status: "pending" },
+  { id: "h76", name: "红河中医院", province: "云南省", city: "红河", level: "二级乙等", type: "中医医院", deviceCount: 1, deviceModels: ["CL-6000"], status: "inactive" },
+
+  { id: "h77", name: "南宁人民医院", province: "广西壮族自治区", city: "南宁", level: "三级甲等", type: "综合医院", deviceCount: 4, deviceModels: ["BS-2000M", "CL-8000"], status: "active" },
+  { id: "h78", name: "柳州中心医院", province: "广西壮族自治区", city: "柳州", level: "三级乙等", type: "综合医院", deviceCount: 3, deviceModels: ["BS-2200", "CL-6000"], status: "active" },
+  { id: "h79", name: "桂林第一人民医院", province: "广西壮族自治区", city: "桂林", level: "二级甲等", type: "综合医院", deviceCount: 2, deviceModels: ["BC-6800"], status: "pending" },
+  { id: "h80", name: "梧州妇幼保健院", province: "广西壮族自治区", city: "梧州", level: "二级甲等", type: "妇幼保健院", deviceCount: 1, deviceModels: ["BC-7500"], status: "inactive" },
 ];
-
-const cities: Record<string, string[]> = {
-  北京市: ["东城区", "西城区", "朝阳区", "海淀区"],
-  上海市: ["黄浦区", "徐汇区", "浦东新区", "静安区"],
-  广东省: ["广州", "深圳", "东莞", "佛山"],
-  江苏省: ["南京", "苏州", "无锡", "常州"],
-  浙江省: ["杭州", "宁波", "温州", "绍兴"],
-  山东省: ["济南", "青岛", "烟台", "潍坊"],
-  四川省: ["成都", "绵阳", "德阳", "宜宾"],
-  河南省: ["郑州", "洛阳", "开封", "新乡"],
-  湖北省: ["武汉", "宜昌", "襄阳", "荆州"],
-  湖南省: ["长沙", "株洲", "湘潭", "衡阳"],
-  福建省: ["福州", "厦门", "泉州", "漳州"],
-  安徽省: ["合肥", "芜湖", "蚌埠", "安庆"],
-  江西省: ["南昌", "上饶", "九江", "赣州"],
-  辽宁省: ["沈阳", "大连", "鞍山", "锦州"],
-  陕西省: ["西安", "宝鸡", "咸阳", "渭南"],
-  重庆市: ["渝中区", "江北区", "沙坪坝区", "渝北区"],
-  河北省: ["石家庄", "唐山", "保定", "邯郸"],
-  山西省: ["太原", "大同", "运城", "临汾"],
-  云南省: ["昆明", "曲靖", "大理", "红河"],
-  广西壮族自治区: ["南宁", "柳州", "桂林", "梧州"],
-};
-
-const levels = ["三级甲等", "三级乙等", "二级甲等", "二级乙等"];
-const types = ["综合医院", "专科医院", "中医医院", "妇幼保健院"];
-const allDeviceModels = ["BS-2000M", "BS-2200", "CL-8000", "CL-6000", "BC-7500", "BC-6800"];
-const statuses: Hospital["status"][] = ["active", "pending", "inactive"];
-
-const hospitalNames = [
-  "人民医院", "中心医院", "第一人民医院", "第二人民医院", "第三人民医院",
-  "中西医结合医院", "中医院", "妇幼保健院", "肿瘤医院", "心血管病医院",
-];
-
-function randomItem<T>(arr: T[]): T {
-  return arr[Math.floor(Math.random() * arr.length)];
-}
-
-function randomItems<T>(arr: T[], min: number, max: number): T[] {
-  const count = Math.floor(Math.random() * (max - min + 1)) + min;
-  const shuffled = [...arr].sort(() => Math.random() - 0.5);
-  return shuffled.slice(0, count);
-}
-
-function generateHospitals(): Hospital[] {
-  const hospitals: Hospital[] = [];
-  for (const province of provinces) {
-    const cityList = cities[province] || [province];
-    const count = Math.floor(Math.random() * 6) + 3;
-    for (let i = 0; i < count; i++) {
-      const city = randomItem(cityList);
-      hospitals.push({
-        id: `h${hospitals.length + 1}`,
-        name: `${city}${randomItem(hospitalNames)}`,
-        province,
-        city,
-        level: randomItem(levels),
-        type: randomItem(types),
-        deviceCount: Math.floor(Math.random() * 8) + 1,
-        deviceModels: randomItems(allDeviceModels, 1, 4),
-        status: randomItem(statuses),
-      });
-    }
-  }
-  return hospitals;
-}
-
-export const mockHospitals: Hospital[] = generateHospitals();

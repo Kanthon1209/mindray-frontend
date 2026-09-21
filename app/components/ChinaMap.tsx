@@ -28,8 +28,9 @@ interface ChinaMapProps {
   selectedProvince?: string;
 }
 
-// 中国地图 GeoJSON URL（echarts 官方示例使用的阿里云数据源）
-const CHINA_MAP_URL =
+// 优先使用本地 GeoJSON，远程作为备用
+const CHINA_MAP_LOCAL = "/china.json";
+const CHINA_MAP_REMOTE =
   "https://geo.datav.aliyun.com/areas_v3/bound/100000_full.json";
 
 let mapRegistered = false;
@@ -127,9 +128,22 @@ export function ChinaMap({ data, onProvinceClick, selectedProvince }: ChinaMapPr
       return;
     }
 
-    // 动态加载地图 GeoJSON
-    fetch(CHINA_MAP_URL)
-      .then((res) => res.json())
+    // 加载地图 GeoJSON（优先本地，远程备用）
+    const loadMap = async (url: string): Promise<unknown> => {
+      const res = await fetch(url);
+      const text = await res.text();
+      // 检查响应是否为有效 JSON
+      if (text.trim().startsWith("<")) {
+        throw new Error(`返回内容非 JSON: ${url}`);
+      }
+      return JSON.parse(text);
+    };
+
+    loadMap(CHINA_MAP_LOCAL)
+      .catch(() => {
+        console.warn("本地地图数据加载失败，尝试远程数据源...");
+        return loadMap(CHINA_MAP_REMOTE);
+      })
       .then((geoJson) => {
         echarts.registerMap("china", geoJson as Parameters<typeof echarts.registerMap>[1]);
         mapRegistered = true;
