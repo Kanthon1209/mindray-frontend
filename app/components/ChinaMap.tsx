@@ -97,7 +97,7 @@ export function ChinaMap({ data, onProvinceClick, selectedProvince }: ChinaMapPr
             type: "map",
             map: "china",
             roam: false,
-            layoutCenter: "center",
+            layoutCenter: ["50%", "50%"],
             layoutSize: "95%",
             label: {
               show: false,
