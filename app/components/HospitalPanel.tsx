@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 import { Search, Plus } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -35,6 +35,11 @@ const statusConfig: Record<
 export function HospitalPanel({ hospitals, selectedProvince }: HospitalPanelProps) {
   const [searchQuery, setSearchQuery] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
+
+  // 筛选条件变化后重置到第 1 页
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [hospitals, selectedProvince]);
 
   const filtered = useMemo(() => {
     const lower = searchQuery.trim().toLowerCase();
@@ -95,7 +100,7 @@ export function HospitalPanel({ hospitals, selectedProvince }: HospitalPanelProp
 
       {/* Table */}
       <div className="flex-1 overflow-auto">
-        <Table>
+        <Table className="min-w-[480px]">
           <TableHeader className="sticky top-0 z-10 bg-white dark:bg-zinc-950">
             <TableRow className="border-b">
               <TableHead className="w-16">省/市</TableHead>

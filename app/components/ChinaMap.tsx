@@ -35,9 +35,24 @@ const CHINA_MAP_REMOTE =
 
 let mapRegistered = false;
 
+// 省份名称标准化：GeoJSON 中可能用简称，mock 数据中用全称
+function normalizeProvinceName(name: string): string {
+  return name
+    .replace(/省$/, "")
+    .replace(/市$/, "")
+    .replace(/自治区$/, "")
+    .replace(/壮族自治区$/, "")
+    .replace(/维吾尔自治区$/, "")
+    .replace(/回族自治区$/, "")
+    .replace(/特别行政区$/, "");
+}
+
 export function ChinaMap({ data, onProvinceClick, selectedProvince }: ChinaMapProps) {
   const chartRef = useRef<HTMLDivElement>(null);
   const chartInstanceRef = useRef<EChartsType | null>(null);
+  // 保存最新的回调到 ref，避免 useEffect 依赖变化导致重新注册
+  const onProvinceClickRef = useRef(onProvinceClick);
+  onProvinceClickRef.current = onProvinceClick;
 
   // 初始化图表
   useEffect(() => {
@@ -46,7 +61,14 @@ export function ChinaMap({ data, onProvinceClick, selectedProvince }: ChinaMapPr
     const chart = echarts.init(chartRef.current);
     chartInstanceRef.current = chart;
 
+    // 注册 click 事件（只注册一次）
+    const clickHandler = (params: { name: string }) => {
+      onProvinceClickRef.current?.(params.name);
+    };
+    chart.on("click", clickHandler);
+
     return () => {
+      chart.off("click", clickHandler);
       chart.dispose();
       chartInstanceRef.current = null;
     };
@@ -60,6 +82,11 @@ export function ChinaMap({ data, onProvinceClick, selectedProvince }: ChinaMapPr
 
     const renderOption = () => {
       const max = Math.max(...data.map((d) => d.value), 1);
+
+      // 构建选中的省份 set（标准化后比较）
+      const selectedSet = new Set(
+        (selectedProvince ? [selectedProvince] : []).map(normalizeProvinceName)
+      );
 
       chart.setOption({
         tooltip: {
@@ -108,18 +135,20 @@ export function ChinaMap({ data, onProvinceClick, selectedProvince }: ChinaMapPr
                 fontSize: 10,
               },
             },
+            // 选中省份高亮
             data: data.map((item) => ({
               name: item.name,
               value: item.value,
+              itemStyle: selectedSet.has(normalizeProvinceName(item.name))
+                ? {
+                    areaColor: "#1e40af",
+                    borderColor: "#f59e0b",
+                    borderWidth: 2,
+                  }
+                : undefined,
             })),
           },
         ],
-      });
-
-      chart.on("click", (params: { name: string }) => {
-        if (onProvinceClick) {
-          onProvinceClick(params.name);
-        }
       });
     };
 
@@ -152,15 +181,34 @@ export function ChinaMap({ data, onProvinceClick, selectedProvince }: ChinaMapPr
       .catch((err) => {
         console.error("加载地图数据失败:", err);
       });
-  }, [data, onProvinceClick, selectedProvince]);
+  }, [data, selectedProvince]);
 
-  // 响应式调整
+  // 响应式调整：监听容器尺寸变化（移动端 Tab 切换时容器从 hidden→block）
   useEffect(() => {
+    const el = chartRef.current;
+    if (!el) return;
+
     const handleResize = () => {
       chartInstanceRef.current?.resize();
     };
+
     window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
+
+    // 使用 ResizeObserver 监听容器尺寸变化（Tab 切换 display 变化时触发）
+    const resizeObserver = new ResizeObserver(() => {
+      // 容器可能被 display:none 隐藏，延迟 resize 等显示后再调整
+      requestAnimationFrame(() => {
+        if (el.offsetWidth > 0 && el.offsetHeight > 0) {
+          chartInstanceRef.current?.resize();
+        }
+      });
+    });
+    resizeObserver.observe(el);
+
+    return () => {
+      window.removeEventListener("resize", handleResize);
+      resizeObserver.disconnect();
+    };
   }, []);
 
   return <div ref={chartRef} className="h-full w-full" />;

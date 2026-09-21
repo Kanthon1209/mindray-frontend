@@ -87,6 +87,26 @@ export default function Home() {
       if (target) result = result.filter((h) => h.type === target);
     }
 
+    // 设备类别筛选
+    if (filters.deviceCategory !== "all") {
+      const categoryModelMap: Record<string, string[]> = {
+        biochem: ["BS-2000M", "BS-2200"],
+        immuno: ["CL-8000", "CL-6000"],
+        hematology: ["BC-7500", "BC-6800"],
+        coag: [],
+        urine: [],
+      };
+      const targetModels = categoryModelMap[filters.deviceCategory];
+      if (targetModels && targetModels.length > 0) {
+        result = result.filter((h) =>
+          h.deviceModels.some((m) => targetModels.includes(m))
+        );
+      } else if (targetModels) {
+        // 类别存在但无对应型号数据（如 coag、urine），返回空列表
+        result = [];
+      }
+    }
+
     // 设备型号筛选
     if (filters.deviceModel !== "all") {
       const modelMap: Record<string, string> = {
