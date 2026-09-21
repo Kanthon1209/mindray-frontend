@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState, useCallback } from "react";
+import { Map as MapIcon, List } from "lucide-react";
 import { Header } from "./components/Header";
 import { FilterBar } from "./components/FilterBar";
 import { ChinaMap } from "./components/ChinaMap";
@@ -27,9 +28,12 @@ const provinceRegionMap: Record<string, string> = {
   辽宁省: "dongbei", 吉林省: "dongbei", 黑龙江省: "dongbei",
 };
 
+type MobileTab = "map" | "list";
+
 export default function Home() {
   const [filters, setFilters] = useState<FilterOptions>(defaultFilters);
   const [selectedProvince, setSelectedProvince] = useState<string | undefined>();
+  const [mobileTab, setMobileTab] = useState<MobileTab>("map");
 
   const handleFilterChange = useCallback(
     (key: keyof FilterOptions, value: string) => {
@@ -43,6 +47,8 @@ export default function Home() {
     setSelectedProvince((prev) =>
       prev === provinceName ? undefined : provinceName
     );
+    // 手机端点击省份后自动切换到列表查看
+    setMobileTab("list");
   }, []);
 
   // 过滤医院列表
@@ -120,19 +126,51 @@ export default function Home() {
 
       <FilterBar filters={filters} onFilterChange={handleFilterChange} />
 
-      <main
-        className="grid min-h-0 flex-1"
-        style={{ gridTemplateColumns: "minmax(0, 7fr) minmax(360px, 3fr)" }}
-      >
-        {/* 左侧地图区域 */}
-        <div className="relative min-h-0 overflow-hidden border-r bg-white dark:bg-zinc-950">
+      {/* 移动端 Tab 切换 */}
+      <div className="flex border-b bg-white dark:bg-zinc-950 md:hidden">
+        <button
+          onClick={() => setMobileTab("map")}
+          className={`flex flex-1 items-center justify-center gap-1.5 py-2.5 text-sm font-medium transition-colors ${
+            mobileTab === "map"
+              ? "border-b-2 border-primary text-primary"
+              : "text-muted-foreground"
+          }`}
+        >
+          <MapIcon className="h-4 w-4" />
+          地图
+        </button>
+        <button
+          onClick={() => setMobileTab("list")}
+          className={`flex flex-1 items-center justify-center gap-1.5 py-2.5 text-sm font-medium transition-colors ${
+            mobileTab === "list"
+              ? "border-b-2 border-primary text-primary"
+              : "text-muted-foreground"
+          }`}
+        >
+          <List className="h-4 w-4" />
+          医院清单
+          {filteredHospitals.length > 0 && (
+            <span className="ml-0.5 rounded bg-muted px-1 text-xs">
+              {filteredHospitals.length}
+            </span>
+          )}
+        </button>
+      </div>
+
+      <main className="min-h-0 flex-1 md:grid md:grid-cols-[minmax(0,7fr)_minmax(360px,3fr)]">
+        {/* 地图区域 */}
+        <div
+          className={`relative min-h-0 overflow-hidden bg-white dark:bg-zinc-950 md:block md:border-r ${
+            mobileTab === "map" ? "block" : "hidden"
+          }`}
+        >
           <ChinaMap
             data={mapData}
             onProvinceClick={handleProvinceClick}
             selectedProvince={selectedProvince}
           />
           {selectedProvince && (
-            <div className="absolute left-4 top-4 rounded-md bg-white/90 px-3 py-1.5 text-xs font-medium shadow-md dark:bg-zinc-900/90">
+            <div className="absolute left-4 top-4 z-20 rounded-md bg-white/90 px-3 py-1.5 text-xs font-medium shadow-md dark:bg-zinc-900/90">
               已选择: {selectedProvince}
               <button
                 onClick={() => setSelectedProvince(undefined)}
@@ -144,11 +182,17 @@ export default function Home() {
           )}
         </div>
 
-        {/* 右侧医院面板 */}
-        <HospitalPanel
-          hospitals={filteredHospitals}
-          selectedProvince={selectedProvince}
-        />
+        {/* 医院面板 */}
+        <div
+          className={`min-h-0 md:block ${
+            mobileTab === "list" ? "block" : "hidden"
+          }`}
+        >
+          <HospitalPanel
+            hospitals={filteredHospitals}
+            selectedProvince={selectedProvince}
+          />
+        </div>
       </main>
     </div>
   );

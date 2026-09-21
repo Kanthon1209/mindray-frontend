@@ -31,9 +31,9 @@ const filterConfigs: FilterConfig[] = [
 
 export function FilterBar({ filters, onFilterChange }: FilterBarProps) {
   return (
-    <div className="flex h-16 items-center gap-6 border-b bg-white px-6 dark:bg-zinc-950">
+    <div className="flex h-auto items-center gap-4 overflow-x-auto border-b bg-white px-4 py-2.5 dark:bg-zinc-950 md:h-16 md:gap-6 md:px-6 md:py-0">
       {filterConfigs.map((config) => (
-        <div key={config.key} className="flex flex-col gap-1">
+        <div key={config.key} className="flex shrink-0 flex-col gap-1">
           <label className="text-xs font-medium text-muted-foreground">
             {config.label}
           </label>
@@ -41,7 +41,7 @@ export function FilterBar({ filters, onFilterChange }: FilterBarProps) {
             value={filters[config.key]}
             onValueChange={(value) => onFilterChange(config.key, value)}
           >
-            <SelectTrigger className="h-8 w-32">
+            <SelectTrigger className="h-8 w-28 md:w-32">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>

@@ -87,9 +87,9 @@ export function HospitalPanel({ hospitals, selectedProvince }: HospitalPanelProp
             className="h-8 pl-8"
           />
         </div>
-        <Button size="sm" variant="default">
+        <Button size="sm" variant="default" className="shrink-0">
           <Plus className="h-4 w-4" />
-          案例维护
+          <span className="hidden sm:inline">案例维护</span>
         </Button>
       </div>
 
@@ -164,26 +164,33 @@ export function HospitalPanel({ hospitals, selectedProvince }: HospitalPanelProp
           >
             上一页
           </Button>
-          {generatePageNumbers(safePage, totalPages).map((page, idx) =>
-            page === "..." ? (
-              <span key={`ellipsis-${idx}`} className="px-1 text-xs text-muted-foreground">
-                ...
-              </span>
-            ) : (
-              <button
-                key={page}
-                onClick={() => setCurrentPage(page as number)}
-                className={cn(
-                  "h-7 min-w-7 rounded-md px-2 text-xs transition-colors",
-                  page === safePage
-                    ? "bg-primary text-primary-foreground"
-                    : "hover:bg-muted"
-                )}
-              >
-                {page}
-              </button>
-            )
-          )}
+          {/* 桌面端显示完整页码 */}
+          <div className="hidden items-center gap-1 sm:flex">
+            {generatePageNumbers(safePage, totalPages).map((page, idx) =>
+              page === "..." ? (
+                <span key={`ellipsis-${idx}`} className="px-1 text-xs text-muted-foreground">
+                  ...
+                </span>
+              ) : (
+                <button
+                  key={page}
+                  onClick={() => setCurrentPage(page as number)}
+                  className={cn(
+                    "h-7 min-w-7 rounded-md px-2 text-xs transition-colors",
+                    page === safePage
+                      ? "bg-primary text-primary-foreground"
+                      : "hover:bg-muted"
+                  )}
+                >
+                  {page}
+                </button>
+              )
+            )}
+          </div>
+          {/* 移动端只显示当前页 */}
+          <span className="flex h-7 min-w-7 items-center justify-center rounded-md bg-primary px-2 text-xs text-primary-foreground sm:hidden">
+            {safePage}
+          </span>
           <Button
             size="sm"
             variant="outline"
